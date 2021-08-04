@@ -1,5 +1,5 @@
 // Silence some warnings so they don't distract from the exercise.
-#![allow(unused_mut)]
+// #![allow(unused_mut)]
 
 pub fn run() {
   // This fancy stuff either gets the first argument as a String, or prints
