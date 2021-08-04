@@ -1,5 +1,5 @@
 // Silence some warnings so they don't distract from the exercise.
-#![allow(dead_code, unused_mut, unused_variables)]
+// #![allow(dead_code, unused_mut, unused_variables)]
 
 pub fn run() {
     // This collects any command-line arguments into a vector of Strings.
@@ -17,10 +17,10 @@ pub fn run() {
         // 1a. Your task: handle the command-line arguments!
         if arg == "sum" {
           // - If arg is "sum", then call the sum() function
-          sum()
+          sum();
         } else if arg == "double" {
           // - If arg is "double", then call the double() function
-          double()
+          double();
         } else {
           // - If arg is anything else, then call the count() function, passing "arg" to it.
           count(arg);
