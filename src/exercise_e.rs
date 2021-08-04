@@ -49,7 +49,7 @@ pub fn run() {
 // code with `cargo run apple` and `cargo run apples'.  Hint: use `.ends_with("s")` on the
 // String reference
 //
-fn inspect(s: &str) {
+fn inspect(s: &String) {
   let case = if s.ends_with("s") {
     "plural"
   } else {
@@ -83,11 +83,13 @@ fn change(s: &mut String) {
 fn eat(arg: String) -> bool {
   let is_banana = arg.starts_with("b") && arg.contains("a");
 
-  if is_banana {
-    println!("Exercise E: Might be bananas");
+  let message = if is_banana {
+    "Might be bananas"
   } else {
-    println!("Exercise E: Not bananas");
-  }
+    "Not bananas"
+  };
+
+  println!("Exercise E: {}", message);
 
   return is_banana;
 }
