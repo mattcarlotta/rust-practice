@@ -29,7 +29,7 @@ pub fn run() {
     println!("Volume is {}", volume(width, height, depth));
 }
 
-fn volume(w: i32, h:i32, d:i32) -> i32 {
+fn volume(w: i32, h: i32, d: i32) -> i32 {
     w * h * d
 }
 
