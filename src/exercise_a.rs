@@ -5,7 +5,7 @@ const READY_AMOUNT: i32 = 2;
 pub fn run() {
     let (missiles, ready) = (STARTING_MISSILES, READY_AMOUNT);
 
-    println!("Firing {} of my {} missiles...", ready, missiles);
+    println!("Exercise A: Firing {} of my {} missiles...", ready, missiles);
 
-    println!("{} missiles left", missiles - ready);
+    println!("Exercise A: {} missiles left", missiles - ready);
 }

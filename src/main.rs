@@ -1,9 +1,11 @@
-mod excercise_a;
-mod excercise_b;
-mod excercise_c;
+mod exercise_a;
+mod exercise_b;
+mod exercise_c;
+mod exercise_d;
 
 fn main() {
-    excercise_a::run();
-    excercise_b::run();
-    excercise_c::run();
+    exercise_a::run();
+    exercise_b::run();
+    exercise_c::run();
+    exercise_d::run();
 }

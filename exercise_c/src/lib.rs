@@ -9,22 +9,22 @@
 // `cargo run` should produce the same output, only now the code is more organized. 🎉
 
 pub fn print_difference(x: f32, y: f32) {
-    println!("Difference between {} and {} is {}", x, y, (x - y).abs());
+    println!("Exercise C: Difference between {} and {} is {}", x, y, (x - y).abs());
 }
 
 pub fn print_array(a: [f32; 2]) {
-    println!("The coordinates are ({}, {})", a[0], a[1]);
+    println!("Exercise C: The coordinates are ({}, {})", a[0], a[1]);
 }
 
 pub fn ding(x: i32) {
     if x == 13 {
-        println!("Ding, you found 13!");
+        println!("Exercise C: Ding, you found 13!");
     }
 }
 
 pub fn on_off(val: bool) {
     if val {
-        println!("Lights are on!");
+        println!("Exercise C: Lights are on!");
     }
 }
 
@@ -34,7 +34,7 @@ pub fn print_distance((x, y): (f32, f32)) {
     // the parameter list above with "(x, y)" and then adjust the a function
     // body to use x and y.
     println!(
-        "Distance to the origin is {}",
+        "Exercise C: Distance to the origin is {}",
         (x.powf(2.0) + y.powf(2.0)).sqrt()
     );
 }

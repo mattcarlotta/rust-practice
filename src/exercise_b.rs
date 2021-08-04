@@ -13,7 +13,7 @@ pub fn run() {
     // {
     let area = area_of(width, height);
     // }
-    println!("Area is {}", area);
+    println!("Exercise B: Area is {}", area);
 
     // 2. The area that was calculated is not correct! Go fix the area_of() function below, then run
     //    the code again and make sure it worked (you should get an area of 28).
@@ -26,7 +26,7 @@ pub fn run() {
     //
     // If you get stuck, remember that this is *very* similar to what `area_of` does.
     //
-    println!("Volume is {}", volume(width, height, depth));
+    println!("Exercise B: Volume is {}", volume(width, height, depth));
 }
 
 fn volume(w: i32, h: i32, d: i32) -> i32 {
