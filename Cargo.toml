@@ -7,3 +7,5 @@ edition = "2018"
 
 [dependencies]
 utils = { path = "./exercise_c" }
+rand = "0.6.5"
+crossbeam = "0.7.3"
