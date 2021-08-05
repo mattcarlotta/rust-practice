@@ -1,10 +1,11 @@
 // Silence some warnings so they don't distract from the exercise.
 // #![allow(unused_mut)]
+use std::env;
 
 pub fn run() {
   // This fancy stuff either gets the first argument as a String, or prints
   // usage and exits if an argument was not supplied to the program.
-  let mut arg: String = std::env::args().nth(1).unwrap_or_else(|| {
+  let mut arg: String = env::args().nth(1).unwrap_or_else(|| {
     println!("Excercise E: Please supply an argument to this program.");
     std::process::exit(-1);
   });
@@ -53,7 +54,7 @@ fn inspect(s: &String) {
   let case = if s.ends_with("s") {
     "plural"
   } else {
-    "singular "
+    "singular"
   };
 
   println!("Exercise E: {} is {}", s, case);
@@ -65,7 +66,7 @@ fn inspect(s: &String) {
 //
 fn change(s: &mut String) {
   let arg = s.clone();
-  let mut message = String::from("was not changed");
+  let mut message = "was not changed".to_string();
 
   if !s.ends_with("s") {
     s.push_str("s");
