@@ -1,14 +1,10 @@
 [package]
-name = "variables"
+name = "image_utils"
 version = "0.1.0"
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-utils = { path = "./exercise_c" }
-image_utils = { path = "./exercise_z" }
-rand = "0.6.5"
-crossbeam = "0.7.3"
 image = "0.23.14"
 num-complex = "0.2.1"
