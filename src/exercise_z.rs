@@ -41,54 +41,28 @@ pub fn run() {
   let subcommand = args.remove(0);
   match subcommand.as_str() {
     "blur" => {
-      check_for_invalid_args(&args, &subcommand, 3);
-
-      let amount = parse_number::<f32>(&subcommand, "amount".to_string(), args.remove(0));
-
-      blur(amount, args.remove(0), args.remove(0));
+      blur(&mut args);
     }
     "brighten" => {
-      check_for_invalid_args(&args, &subcommand, 3);
-
-      let amount = parse_number::<i32>(&subcommand, "amount".to_string(), args.remove(0));
-
-      brighten(amount, args.remove(0), args.remove(0));
+      brighten(&mut args);
     }
     "crop" => {
-      check_for_invalid_args(&args, &subcommand, 6);
-
-      let mut options = Vec::with_capacity(4);
-      for property in ["x", "y", "width", "height"] {
-        options.push(parse_number::<u32>(
-          &subcommand,
-          property.to_string(),
-          args.remove(0),
-        ));
-      }
-
-      crop(options, args.remove(0), args.remove(0));
-    }
-    "grayscale" => {
-      check_for_invalid_args(&args, &subcommand, 2);
-
-      grayscale(args.remove(0), args.remove(0));
-    }
-    // **Rotate** -- see the rotate() function below
-    "invert" => {
-      check_for_invalid_args(&args, &subcommand, 2);
-
-      invert(args.remove(0), args.remove(0));
+      crop(&mut args);
     }
     "fractal" => {
-      check_for_invalid_args(&args, &subcommand, 1);
-
-      let output = args.remove(0);
-      fractal(output);
+      fractal(&mut args);
+    }
+    // **Generate** -- see the generate() function below -- this should be sort of like "fractal()"!
+    "grayscale" => {
+      grayscale(&mut args);
     }
     "help" => {
       print_usage_and_exit();
     }
-    // **Generate** -- see the generate() function below -- this should be sort of like "fractal()"!
+    "invert" => {
+      invert(&mut args);
+    }
+    // **Rotate** -- see the rotate() function below
     _ => {
       print_usage_and_exit();
     }
