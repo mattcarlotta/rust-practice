@@ -1,7 +1,6 @@
 #![allow(dead_code, unused_imports, unused_variables)]
 
-use image::{DynamicImage, ImageError, ImageResult};
-use std::io::ErrorKind;
+use image::DynamicImage;
 use std::str::FromStr;
 
 // FINAL PROJECT
@@ -44,43 +43,69 @@ pub fn run() {
   }
   let subcommand = args.remove(0);
   match subcommand.as_str() {
-    // EXAMPLE FOR CONVERSION OPERATIONS
+    // EXAMPLE FOR CONVERSION OPEamountNS
     "blur" => {
-      let (ratio, infile, outfile): (f32, String, String) =
-        parse_common_args::<f32>(subcommand, &mut args);
-      blur(ratio, infile, outfile);
+      let (amount, input, output): (f32, String, String) =
+        parse_common_args::<f32>(&subcommand, &mut args);
+      blur(amount, input, output);
     }
-    "brighten" => {
-      let (ratio, infile, outfile): (i32, String, String) =
-        parse_common_args::<i32>(subcommand, &mut args);
-      // let primitive_ratio =
-      // **OPTION**
-      // Improve the blur implementation -- see the blur() function below
-      brighten(ratio, infile, outfile);
-    }
-
     // **OPTION**
     // Brighten -- see the brighten() function below
-
+    "brighten" => {
+      let (amount, input, output): (i32, String, String) =
+        parse_common_args::<i32>(&subcommand, &mut args);
+      // let primitive_amount =
+      // **OPTION**
+      // Improve the blur implementation -- see the blur() function below
+      brighten(amount, input, output);
+    }
     // **OPTION**
     // Crop -- see the crop() function below
+    "crop" => {
+      if args.len() != 6 {
+        print_usage_and_exit();
+      };
+
+      let mut options: [u32; 4] = [0; 4];
+      let properties: [&str; 4] = ["x", "y", "width", "height"];
+      for x in 0..options.len() {
+        options[x] = parse_number::<u32>(&subcommand, properties[x].to_string(), args.remove(0));
+      }
+      // let primitive_amount =
+      // **OPTION**
+      // Improve the blur implementation -- see the blur() function below
+      crop(options, args.remove(0), args.remove(0));
+    }
+    // **OPTION**
+    // Grayscale -- see the grayscale() function below
+    "grayscale" => {
+      if args.len() != 2 {
+        print_usage_and_exit();
+      };
+
+      grayscale(args.remove(0), args.remove(0));
+    }
 
     // **OPTION**
     // Rotate -- see the rotate() function below
 
     // **OPTION**
     // Invert -- see the invert() function below
+    "invert" => {
+      if args.len() != 2 {
+        print_usage_and_exit();
+      };
 
-    // **OPTION**
-    // Grayscale -- see the grayscale() function below
+      invert(args.remove(0), args.remove(0));
+    }
 
     // A VERY DIFFERENT EXAMPLE...a really fun one. :-)
     "fractal" => {
       if args.len() != 1 {
         print_usage_and_exit();
       }
-      let outfile = args.remove(0);
-      fractal(outfile);
+      let output = args.remove(0);
+      fractal(output);
     }
     "help" => {
       print_usage_and_exit();
@@ -96,60 +121,68 @@ pub fn run() {
   }
 }
 
-fn open_image(infile: String) -> DynamicImage {
-  let img = image::open(infile).expect("Failed to open INFILE.");
+fn open_image(input: String) -> DynamicImage {
+  image::open(input).expect("Failed to open input.")
+}
 
-  return img;
+fn save_image(img: DynamicImage, output: String) {
+  img.save(output).expect("Failed writing output.");
 }
 
 fn print_usage_and_exit() {
-  println!("\n BASIC USAGE");
-  println!("-----------------------------------------------------------");
-  println!("| command   | arguments                                   |");
-  println!("-----------------------------------------------------------");
-  println!("| blur      | RATIO(f32) INFILE(String) OUTFILE(String)   |");
-  println!("| brighten  | RATIO(i32) INFILE(String) OUTFILE(String)   |");
-  println!("-----------------------------------------------------------");
+  println!("\nImage Manipulator");
+  println!("Matt Carlotta <matt@mattcarlotta.sh>");
+  println!("Manipulates images using the CLI\n");
+  println!("<subcommand> arguments\n");
+  println!("blur         <amount(f32)> <input(String)> <output(String)>");
+  println!("brighten     <amount(i32)> <input(String)> <output(String)>");
+  println!(
+    "crop         <x(u32)> <y(32)> <width(u32)> <height(u32)> <input(String)> <output(String)>"
+  );
+  println!("fractal      <output(String)>");
+  println!("grayscale    <input(String)> <output(String)>");
+  println!("invert       <input(String)> <output(String)>");
 
   std::process::exit(-1);
 }
 
-fn blur(ratio: f32, infile: String, outfile: String) {
+fn blur(amount: f32, input: String, output: String) {
   // Here's how you open an existing image file
-  let img = open_image(infile);
+  let img = open_image(input);
   // **OPTION**
   // Parse the blur amount (an f32) from the command-line and pass it through
   // to this function, instead of hard-coding it to 2.0.
-  let new_image = img.blur(ratio);
+  let new_image = img.blur(amount);
   // Here's how you save an image to a file.
-  new_image.save(outfile).expect("Failed writing OUTFILE.");
+  save_image(new_image, output);
 }
 
-fn brighten(ratio: i32, infile: String, outfile: String) {
+fn brighten(amount: i32, input: String, output: String) {
   // See blur() for an example of how to open / save an image.
-  let img = open_image(infile);
+  let img = open_image(input);
   // .brighten() takes one argument, an i32.  Positive numbers brighten the
   // image. Negative numbers darken it.  It returns a new image.
-  let new_image = img.brighten(ratio);
+  let new_image = img.brighten(amount);
   // Challenge: parse the brightness amount from the command-line and pass it
   // through to this function.
 
-  new_image.save(outfile).expect("Failed writing OUTFILE.");
+  save_image(new_image, output);
 }
 
-fn crop(infile: String, outfile: String) {
+fn crop(options: [u32; 4], input: String, output: String) {
   // See blur() for an example of how to open an image.
-
+  let mut img = open_image(input);
   // .crop() takes four arguments: x: u32, y: u32, width: u32, height: u32
   // You may hard-code them, if you like.  It returns a new image.
-
+  let new_image = img.crop(options[0], options[1], options[2], options[3]);
   // Challenge: parse the four values from the command-line and pass them
   // through to this function.
 
+  save_image(new_image, output);
   // See blur() for an example of how to save the image.
 }
 
-fn rotate(infile: String, outfile: String) {
+fn rotate(input: String, output: String) {
   // See blur() for an example of how to open an image.
 
   // There are 3 rotate functions to choose from (all clockwise):
@@ -164,24 +197,26 @@ fn rotate(infile: String, outfile: String) {
   // See blur() for an example of how to save the image.
 }
 
-fn invert(infile: String, outfile: String) {
-  // See blur() for an example of how to open an image.
+fn invert(input: String, output: String) {
+  let mut img = open_image(input);
 
   // .invert() takes no arguments and converts the image in-place, so you
   // will use the same image to save out to a different file.
+  img.invert();
 
-  // See blur() for an example of how to save the image.
+  save_image(img, output);
 }
 
-fn grayscale(infile: String, outfile: String) {
-  // See blur() for an example of how to open an image.
+fn grayscale(input: String, output: String) {
+  let img = open_image(input);
 
   // .grayscale() takes no arguments. It returns a new image.
+  let new_image = img.grayscale();
 
-  // See blur() for an example of how to save the image.
+  save_image(new_image, output);
 }
 
-fn generate(outfile: String) {
+fn generate(output: String) {
   // Create an ImageBuffer -- see fractal() for an example
 
   // Iterate over the coordinates and pixels of the image -- see fractal() for an example
@@ -197,7 +232,7 @@ fn generate(outfile: String) {
 }
 
 // This code was adapted from https://github.com/PistonDevelopers/image
-fn fractal(outfile: String) {
+fn fractal(output: String) {
   let width = 800;
   let height = 800;
 
@@ -229,28 +264,39 @@ fn fractal(outfile: String) {
     *pixel = image::Rgb([red, green, blue]);
   }
 
-  imgbuf.save(outfile).unwrap();
+  imgbuf.save(output).unwrap();
 }
 
-fn parse_common_args<T>(subcommand: String, args: &mut Vec<String>) -> (T, String, String)
+fn parse_number<T>(subcommand: &String, property: String, num_str: String) -> T
+where
+  T: FromStr,
+  <T as std::str::FromStr>::Err: std::fmt::Debug,
+{
+  let amount = num_str.parse::<T>().unwrap_or_else(|_error| {
+    println!(
+      "\n\x1b[31m[ERROR]: The \x1b[1m{}\x1b[0m\x1b[31m argument contains an invalid number. See \x1b[1m{}\x1b[0m\x1b[31m help for more assitance.\x1b[0m\n", property, subcommand
+    );
+
+    std::process::exit(1);
+  });
+
+  return amount;
+}
+
+fn parse_common_args<T>(subcommand: &String, args: &mut Vec<String>) -> (T, String, String)
 where
   T: FromStr,
   <T as std::str::FromStr>::Err: std::fmt::Debug,
 {
   if args.len() != 3 {
     print_usage_and_exit();
-  }
-  let ratio = args.remove(0).parse::<T>().unwrap_or_else(|_error| {
-    println!(
-      "\n\x1b[31m[ERROR]: The \"ratio\" argument contains an invalid number. See \x1b[1m\"{}\"\x1b[0m\x1b[31m help for more assitance.\x1b[0m\n", subcommand
-    );
+  };
 
-    std::process::exit(1);
-  });
-  let infile = args.remove(0);
-  let outfile = args.remove(0);
+  let amount = parse_number::<T>(&subcommand, "amount".to_string(), args.remove(0));
+  let input = args.remove(0);
+  let output = args.remove(0);
 
-  return (ratio, infile, outfile);
+  return (amount, input, output);
 }
 
 // **SUPER CHALLENGE FOR LATER** - Let's face it, you don't have time for this during class.
@@ -259,14 +305,14 @@ where
 //
 // For example, if you run:
 //
-//   cargo run infile.png outfile.png blur 2.5 invert rotate 180 brighten 10
+//   cargo run input.png output.png blur 2.5 invert rotate 180 brighten 10
 //
 // ...then your program would:
-// - read infile.png
+// - read input.png
 // - apply a blur of 2.5
 // - invert the colors
 // - rotate the image 180 degrees clockwise
 // - brighten the image by 10
-// - and write the result to outfile.png
+// - and write the result to output.png
 //
 // Good luck!
