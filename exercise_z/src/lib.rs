@@ -1,7 +1,7 @@
-#![allow(dead_code, unused_imports, unused_variables)]
+// #![allow(dead_code, unused_imports, unused_variables)]
 
 use image::DynamicImage;
-use std::fmt::Debug;
+// use std::fmt::Debug;
 use std::process::exit;
 use std::str::FromStr;
 
@@ -51,14 +51,12 @@ pub fn open_image(input: String) -> DynamicImage {
 
 pub fn save_image(img: DynamicImage, output: String) {
   img.save(output).expect("Failed writing output.");
+
+  exit(0);
 }
 
-pub fn parse_number<T>(subcommand: &String, property: String, num_str: String) -> T
-where
-  T: FromStr,
-  <T as FromStr>::Err: Debug,
-{
-  let amount = num_str.parse::<T>().unwrap_or_else(|_error| {
+pub fn parse_number<T: FromStr>(subcommand: &String, property: String, num_str: String) -> T {
+  num_str.parse::<T>().unwrap_or_else(|_error| {
     println!(
       "\n\x1b[31m[ERROR]: The \x1b[1m{}\x1b[0m\x1b[31m argument contains an invalid number. See \x1b[1m{}\x1b[0m\x1b[31m subcommand help for more assitance.\x1b[0m\n", property, subcommand
     );
@@ -66,9 +64,7 @@ where
     print_commands();
 
     exit(1);
-  });
-
-  return amount;
+  })
 }
 
 pub fn blur(args: &mut Vec<String>) {
@@ -203,32 +199,32 @@ pub fn fractal(args: &mut Vec<String>) {
   }
 }
 
-pub fn generate(output: String) {
-  // Create an ImageBuffer -- see fractal() for an example
+// pub fn generate(output: String) {
+// Create an ImageBuffer -- see fractal() for an example
 
-  // Iterate over the coordinates and pixels of the image -- see fractal() for an example
+// Iterate over the coordinates and pixels of the image -- see fractal() for an example
 
-  // Set the image to some solid color. -- see fractal() for an example
+// Set the image to some solid color. -- see fractal() for an example
 
-  // Challenge: parse some color data from the command-line, pass it through
-  // to this function to use for the solid color.
+// Challenge: parse some color data from the command-line, pass it through
+// to this function to use for the solid color.
 
-  // Challenge 2: Generate something more interesting!
+// Challenge 2: Generate something more interesting!
 
-  // See blur() for an example of how to save the image
-}
+// See blur() for an example of how to save the image
+// }
 
-pub fn rotate(input: String, output: String) {
-  // See blur() for an example of how to open an image.
+// pub fn rotate(input: String, output: String) {
+// See blur() for an example of how to open an image.
 
-  // There are 3 rotate functions to choose from (all clockwise):
-  //   .rotate90()
-  //   .rotate180()
-  //   .rotate270()
-  // All three methods return a new image.  Pick one and use it!
+// There are 3 rotate functions to choose from (all clockwise):
+//   .rotate90()
+//   .rotate180()
+//   .rotate270()
+// All three methods return a new image.  Pick one and use it!
 
-  // Challenge: parse the rotation amount from the command-line, pass it
-  // through to this function to select which method to call.
+// Challenge: parse the rotation amount from the command-line, pass it
+// through to this function to select which method to call.
 
-  // See blur() for an example of how to save the image.
-}
+// See blur() for an example of how to save the image.
+//}

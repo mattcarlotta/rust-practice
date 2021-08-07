@@ -40,32 +40,16 @@ pub fn run() {
   }
   let subcommand = args.remove(0);
   match subcommand.as_str() {
-    "blur" => {
-      blur(&mut args);
-    }
-    "brighten" => {
-      brighten(&mut args);
-    }
-    "crop" => {
-      crop(&mut args);
-    }
-    "fractal" => {
-      fractal(&mut args);
-    }
+    "blur" => blur(&mut args),
+    "brighten" => brighten(&mut args),
+    "crop" => crop(&mut args),
+    "fractal" => fractal(&mut args),
     // **Generate** -- see the generate() function below -- this should be sort of like "fractal()"!
-    "grayscale" => {
-      grayscale(&mut args);
-    }
-    "help" => {
-      print_usage_and_exit();
-    }
-    "invert" => {
-      invert(&mut args);
-    }
+    "grayscale" => grayscale(&mut args),
+    "help" => print_usage_and_exit(),
+    "invert" => invert(&mut args),
     // **Rotate** -- see the rotate() function below
-    _ => {
-      print_usage_and_exit();
-    }
+    _ => print_usage_and_exit(),
   }
 }
 
