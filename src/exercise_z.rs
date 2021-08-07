@@ -1,4 +1,5 @@
 use image_utils::*;
+use std::env;
 
 // FINAL PROJECT
 //
@@ -34,12 +35,11 @@ pub fn run() {
   //
   // Challenge: If you're feeling really ambitious, you could delete this code
   // and use the "clap" library instead: https://docs.rs/clap/2.32.0/clap/
-  let mut args: Vec<String> = std::env::args().skip(1).collect();
+  let mut args: Vec<String> = env::args().skip(1).collect();
   if args.is_empty() {
     print_usage_and_exit();
   }
-  let subcommand = args.remove(0);
-  match subcommand.as_str() {
+  match args.remove(0).as_str() {
     "blur" => blur(&mut args),
     "brighten" => brighten(&mut args),
     "crop" => crop(&mut args),

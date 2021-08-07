@@ -2,17 +2,18 @@
 
 use image::DynamicImage;
 // use std::fmt::Debug;
+use num_complex::Complex;
 use std::process::exit;
 use std::str::FromStr;
 
 pub fn check_for_invalid_args(
   args: &Vec<String>,
-  subcommand: String,
+  subcommand: &str,
   expected_length: usize,
 ) -> Option<()> {
   if args.is_empty() || args.len() != expected_length {
     println!(
-      "\n\x1b[31m[ERROR]: Invalid \x1b[1m{0}\x1b[0m\x1b[31m arguments. Expected \x1b[1m{1}\x1b[0m\x1b[31m argument(s), but received \x1b[1m{2}\x1b[0m\x1b[31m. See \x1b[1m{0}\x1b[0m\x1b[31m subcommand help for more assitance:\x1b[0m\n",
+      "\n\x1b[31m[ERROR]: Invalid \x1b[1m{0}\x1b[0m\x1b[31m arguments. Expected \x1b[1m{1}\x1b[0m\x1b[31m argument(s), but received \x1b[1m{2}\x1b[0m\x1b[31m. See the \x1b[1m{0}\x1b[0m\x1b[31m subcommand help for more assitance:\x1b[0m\n",
       subcommand,
       expected_length,
       args.len()
@@ -25,11 +26,11 @@ pub fn check_for_invalid_args(
 }
 
 pub fn print_commands() {
-  println!("<subcommand> arguments\n");
+  println!("subcommand   <arguments>\n");
   println!("blur         <amount(f32)> <input(String)> <output(String)>");
   println!("brighten     <amount(i32)> <input(String)> <output(String)>");
   println!(
-    "crop         <x(u32)> <y(32)> <width(u32)> <height(u32)> <input(String)> <output(String)>"
+    "crop         <x(u32)> <y(u32)> <width(u32)> <height(u32)> <input(String)> <output(String)>"
   );
   println!("fractal      <output(String)>");
   println!("grayscale    <input(String)> <output(String)>");
@@ -55,10 +56,10 @@ pub fn save_image(img: DynamicImage, output: String) {
   exit(0);
 }
 
-pub fn parse_number<T: FromStr>(subcommand: &String, property: String, num_str: String) -> T {
+pub fn parse_number<T: FromStr>(subcommand: &str, property: &str, num_str: String) -> T {
   num_str.parse::<T>().unwrap_or_else(|_error| {
     println!(
-      "\n\x1b[31m[ERROR]: The \x1b[1m{}\x1b[0m\x1b[31m argument contains an invalid number. See \x1b[1m{}\x1b[0m\x1b[31m subcommand help for more assitance.\x1b[0m\n", property, subcommand
+      "\n\x1b[31m[ERROR]: The \x1b[1m<{0}>\x1b[0m\x1b[31m argument passed to \x1b[1m{1}\x1b[0m\x1b[31m is an invalid number. See the \x1b[1m{1}\x1b[0m\x1b[31m subcommand help for more assitance:\x1b[0m\n", property, subcommand
     );
 
     print_commands();
@@ -68,9 +69,9 @@ pub fn parse_number<T: FromStr>(subcommand: &String, property: String, num_str: 
 }
 
 pub fn blur(args: &mut Vec<String>) {
-  match check_for_invalid_args(&args, "blur".to_string(), 3) {
+  match check_for_invalid_args(&args, "blur", 3) {
     Some(()) => {
-      let amount = parse_number::<f32>(&"blur".to_string(), "amount".to_string(), args.remove(0));
+      let amount = parse_number::<f32>("blur", "amount", args.remove(0));
       // Here's how you open an existing image file
       let img = open_image(args.remove(0));
       // **OPTION**
@@ -85,13 +86,9 @@ pub fn blur(args: &mut Vec<String>) {
 }
 
 pub fn brighten(args: &mut Vec<String>) {
-  match check_for_invalid_args(&args, "brighten".to_string(), 3) {
+  match check_for_invalid_args(&args, "brighten", 3) {
     Some(()) => {
-      let amount = parse_number::<i32>(
-        &"brighten".to_string(),
-        "amount".to_string(),
-        args.remove(0),
-      );
+      let amount = parse_number::<i32>("brighten", "amount", args.remove(0));
       // See blur() for an example of how to open / save an image.
       let img = open_image(args.remove(0));
       // .brighten() takes one argument, an i32.  Positive numbers brighten the
@@ -106,15 +103,11 @@ pub fn brighten(args: &mut Vec<String>) {
 }
 
 pub fn crop(args: &mut Vec<String>) {
-  match check_for_invalid_args(&args, "crop".to_string(), 6) {
+  match check_for_invalid_args(&args, "crop", 6) {
     Some(()) => {
       let mut options = Vec::with_capacity(4);
       for property in ["x", "y", "width", "height"] {
-        options.push(parse_number::<u32>(
-          &"crop".to_string(),
-          property.to_string(),
-          args.remove(0),
-        ));
+        options.push(parse_number::<u32>("crop", property, args.remove(0)));
       }
 
       // See blur() for an example of how to open an image.
@@ -132,7 +125,7 @@ pub fn crop(args: &mut Vec<String>) {
 }
 
 pub fn grayscale(args: &mut Vec<String>) {
-  match check_for_invalid_args(&args, "grayscale".to_string(), 2) {
+  match check_for_invalid_args(&args, "grayscale", 2) {
     Some(()) => {
       let img = open_image(args.remove(0));
 
@@ -145,7 +138,7 @@ pub fn grayscale(args: &mut Vec<String>) {
 }
 
 pub fn invert(args: &mut Vec<String>) {
-  match check_for_invalid_args(&args, "invert".to_string(), 2) {
+  match check_for_invalid_args(&args, "invert", 2) {
     Some(()) => {
       let mut img = open_image(args.remove(0));
 
@@ -160,7 +153,7 @@ pub fn invert(args: &mut Vec<String>) {
 
 // This code was adapted from https://github.com/PistonDevelopers/image
 pub fn fractal(args: &mut Vec<String>) {
-  match check_for_invalid_args(&args, "fractal".to_string(), 1) {
+  match check_for_invalid_args(&args, "fractal", 1) {
     Some(()) => {
       let width = 800;
       let height = 800;
@@ -180,8 +173,8 @@ pub fn fractal(args: &mut Vec<String>) {
         let cx = y as f32 * scale_x - 1.5;
         let cy = x as f32 * scale_y - 1.5;
 
-        let c = num_complex::Complex::new(-0.4, 0.6);
-        let mut z = num_complex::Complex::new(cx, cy);
+        let c = Complex::new(-0.4, 0.6);
+        let mut z = Complex::new(cx, cy);
 
         let mut green = 0;
         while green < 255 && z.norm() <= 2.0 {
