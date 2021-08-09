@@ -1,6 +1,6 @@
 // #![allow(dead_code, unused_imports, unused_variables)]
 
-use image::DynamicImage;
+use image::{DynamicImage, ImageBuffer};
 // use std::fmt::Debug;
 use num_complex::Complex;
 use std::process::exit;
@@ -33,8 +33,12 @@ pub fn print_commands() {
     "crop         <x(u32)> <y(u32)> <width(u32)> <height(u32)> <input(String)> <output(String)>"
   );
   println!("fractal      <output(String)>");
+  println!(
+    "generate     <width(u32)> <height(u32)> <red(u8)> <green(u8)> <blue(u8)> <output(String)>"
+  );
   println!("grayscale    <input(String)> <output(String)>");
   println!("invert       <input(String)> <output(String)>");
+  println!("rotate       <amount(i32 -> 90 | 180 | 270)> <input(String)> <output(String)>");
   println!("");
 }
 
@@ -124,6 +128,32 @@ pub fn crop(args: &mut Vec<String>) {
   }
 }
 
+pub fn generate(args: &mut Vec<String>) {
+  match check_for_invalid_args(&args, "rotate", 6) {
+    Some(()) => {
+      let mut options = Vec::with_capacity(2);
+      for property in ["width", "height"] {
+        options.push(parse_number::<u32>("generate", property, args.remove(0)));
+      }
+
+      let mut values = Vec::with_capacity(3);
+      for property in ["red", "green", "blue"] {
+        values.push(parse_number::<u8>("generate", property, args.remove(0)))
+      }
+
+      let mut imgbuf = ImageBuffer::new(options[0], options[1]);
+
+      for (_x, _y, pixel) in imgbuf.enumerate_pixels_mut() {
+        // Actually set the pixel. red, green, and blue are u8 values!
+        *pixel = image::Rgb([values[0], values[1], values[2]]);
+      }
+
+      imgbuf.save(args.remove(0)).unwrap();
+    }
+    None => exit(1),
+  }
+}
+
 pub fn grayscale(args: &mut Vec<String>) {
   match check_for_invalid_args(&args, "grayscale", 2) {
     Some(()) => {
@@ -158,7 +188,7 @@ pub fn fractal(args: &mut Vec<String>) {
       let width = 800;
       let height = 800;
 
-      let mut imgbuf = image::ImageBuffer::new(width, height);
+      let mut imgbuf = ImageBuffer::new(width, height);
 
       let scale_x = 3.0 / width as f32;
       let scale_y = 3.0 / height as f32;
@@ -192,32 +222,21 @@ pub fn fractal(args: &mut Vec<String>) {
   }
 }
 
-// pub fn generate(output: String) {
-// Create an ImageBuffer -- see fractal() for an example
+pub fn rotate(args: &mut Vec<String>) {
+  match check_for_invalid_args(&args, "rotate", 3) {
+    Some(()) => {
+      let rotate = args.remove(0);
+      let img = open_image(args.remove(0));
 
-// Iterate over the coordinates and pixels of the image -- see fractal() for an example
+      let new_image = match rotate.as_str() {
+        "90" => img.rotate90(),
+        "180" => img.rotate180(),
+        "270" => img.rotate270(),
+        _ => img.rotate90(),
+      };
 
-// Set the image to some solid color. -- see fractal() for an example
-
-// Challenge: parse some color data from the command-line, pass it through
-// to this function to use for the solid color.
-
-// Challenge 2: Generate something more interesting!
-
-// See blur() for an example of how to save the image
-// }
-
-// pub fn rotate(input: String, output: String) {
-// See blur() for an example of how to open an image.
-
-// There are 3 rotate functions to choose from (all clockwise):
-//   .rotate90()
-//   .rotate180()
-//   .rotate270()
-// All three methods return a new image.  Pick one and use it!
-
-// Challenge: parse the rotation amount from the command-line, pass it
-// through to this function to select which method to call.
-
-// See blur() for an example of how to save the image.
-//}
+      save_image(new_image, args.remove(0));
+    }
+    None => exit(1),
+  }
+}
