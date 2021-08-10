@@ -1,7 +1,4 @@
-// #![allow(dead_code, unused_imports, unused_variables)]
-
 use image::{DynamicImage, ImageBuffer};
-// use std::fmt::Debug;
 use num_complex::Complex;
 use std::process::exit;
 use std::str::FromStr;
@@ -109,16 +106,14 @@ pub fn brighten(args: &mut Vec<String>) {
 pub fn crop(args: &mut Vec<String>) {
   match check_for_invalid_args(&args, "crop", 6) {
     Some(()) => {
-      let mut options = Vec::with_capacity(4);
-      for property in ["x", "y", "width", "height"] {
-        options.push(parse_number::<u32>("crop", property, args.remove(0)));
-      }
+      let [x, y, width, height] =
+        ["x", "y", "width", "height"].map(|opt| parse_number::<u32>("crop", opt, args.remove(0)));
 
       // See blur() for an example of how to open an image.
       let mut img = open_image(args.remove(0));
       // .crop() takes four arguments: x: u32, y: u32, width: u32, height: u32
       // You may hard-code them, if you like.  It returns a new image.
-      let new_image = img.crop(options[0], options[1], options[2], options[3]);
+      let new_image = img.crop(x, y, width, height);
       // Challenge: parse the four values from the command-line and pass them
       // through to this function.
 
@@ -131,21 +126,17 @@ pub fn crop(args: &mut Vec<String>) {
 pub fn generate(args: &mut Vec<String>) {
   match check_for_invalid_args(&args, "rotate", 6) {
     Some(()) => {
-      let mut options = Vec::with_capacity(2);
-      for property in ["width", "height"] {
-        options.push(parse_number::<u32>("generate", property, args.remove(0)));
-      }
+      let [width, height] =
+        ["width", "height"].map(|d| parse_number::<u32>("generate", d, args.remove(0)));
 
-      let mut values = Vec::with_capacity(3);
-      for property in ["red", "green", "blue"] {
-        values.push(parse_number::<u8>("generate", property, args.remove(0)))
-      }
+      let [red, green, blue]: [u8; 3] =
+        ["red", "green", "blue"].map(|c| parse_number::<u8>("generate", c, args.remove(0)));
 
-      let mut imgbuf = ImageBuffer::new(options[0], options[1]);
+      let mut imgbuf = ImageBuffer::new(width, height);
 
       for (_x, _y, pixel) in imgbuf.enumerate_pixels_mut() {
         // Actually set the pixel. red, green, and blue are u8 values!
-        *pixel = image::Rgb([values[0], values[1], values[2]]);
+        *pixel = image::Rgb([red, green, blue]);
       }
 
       imgbuf.save(args.remove(0)).unwrap();
