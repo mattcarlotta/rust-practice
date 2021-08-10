@@ -3,6 +3,15 @@ use num_complex::Complex;
 use std::process::exit;
 use std::str::FromStr;
 
+/// Checks if a command was passed the correct number of arguments.
+///
+/// Arguments:
+///
+/// * `args` - &Vec<String>
+/// * `subcommand` - &str
+/// * `expected_length` - usize
+///
+/// Usage: ```check_for_invalid_args(args, "crop", 6);```
 pub fn check_for_invalid_args(
   args: &Vec<String>,
   subcommand: &str,
@@ -22,6 +31,7 @@ pub fn check_for_invalid_args(
   return Some(());
 }
 
+/// Prints commands and their arguments.
 pub fn print_commands() {
   println!("subcommand   <arguments>\n");
   println!("blur         <amount(f32)> <input(String)> <output(String)>");
@@ -39,6 +49,7 @@ pub fn print_commands() {
   println!("");
 }
 
+/// Prints application usage information.
 pub fn print_usage_and_exit() {
   println!("\nImage Manipulator");
   println!("Matt Carlotta <matt@mattcarlotta.sh>");
@@ -47,16 +58,40 @@ pub fn print_usage_and_exit() {
   exit(1);
 }
 
+/// Open a file image.
+///
+/// Arguments:
+///
+/// * `input` - String
+///
+/// Usage: ```open_image("input.png");```
 pub fn open_image(input: String) -> DynamicImage {
   image::open(input).expect("Failed to open input.")
 }
 
+/// Saves a dynamic image.
+///
+/// Arguments:
+///
+/// * `img` - DynamicImage
+/// * `output` - String
+///
+/// Usage: ```save_image(image, "output.png");```
 pub fn save_image(img: DynamicImage, output: String) {
   img.save(output).expect("Failed writing output.");
 
   exit(0);
 }
 
+/// Dynamically parses a string to a number type for a `command` and `property`.
+///
+/// Arguments:
+///
+/// * `subcommand` - String
+/// * `property` - String
+/// * `num_str` - String
+///
+/// Usage: ```parse_number("crop", "x", "255");```
 pub fn parse_number<T: FromStr>(subcommand: &str, property: &str, num_str: String) -> T {
   num_str.parse::<T>().unwrap_or_else(|_error| {
     println!(
@@ -69,6 +104,15 @@ pub fn parse_number<T: FromStr>(subcommand: &str, property: &str, num_str: Strin
   })
 }
 
+/// Blurs an image by an `amount`.
+///
+/// Arguments:
+///
+/// * `amount` - u32
+/// * `input` - String
+/// * `output` - String
+///
+/// Usage: ```blur 100 input.png output.png```
 pub fn blur(args: &mut Vec<String>) {
   match check_for_invalid_args(&args, "blur", 3) {
     Some(()) => {
@@ -86,6 +130,15 @@ pub fn blur(args: &mut Vec<String>) {
   }
 }
 
+/// Brightens an image by an `amount`.
+///
+/// Arguments:
+///
+/// * `amount` - u32
+/// * `input` - String
+/// * `output` - String
+///
+/// Usage: ```brighten 100 input.png output.png```
 pub fn brighten(args: &mut Vec<String>) {
   match check_for_invalid_args(&args, "brighten", 3) {
     Some(()) => {
@@ -103,6 +156,18 @@ pub fn brighten(args: &mut Vec<String>) {
   }
 }
 
+/// Crops an image by `x`, `y`, `width` and `height`.
+///
+/// Arguments:
+///
+/// * `x` - u32
+/// * `y` - u32
+/// * `width` - u32
+/// * `height` - u32
+/// * `input` - String
+/// * `output` - String
+///
+/// Usage: ```crop 0 0 640 480 input.png output.png```
 pub fn crop(args: &mut Vec<String>) {
   match check_for_invalid_args(&args, "crop", 6) {
     Some(()) => {
@@ -123,56 +188,13 @@ pub fn crop(args: &mut Vec<String>) {
   }
 }
 
-pub fn generate(args: &mut Vec<String>) {
-  match check_for_invalid_args(&args, "rotate", 6) {
-    Some(()) => {
-      let [width, height] =
-        ["width", "height"].map(|d| parse_number::<u32>("generate", d, args.remove(0)));
-
-      let [red, green, blue]: [u8; 3] =
-        ["red", "green", "blue"].map(|c| parse_number::<u8>("generate", c, args.remove(0)));
-
-      let mut imgbuf = ImageBuffer::new(width, height);
-
-      for (_x, _y, pixel) in imgbuf.enumerate_pixels_mut() {
-        // Actually set the pixel. red, green, and blue are u8 values!
-        *pixel = image::Rgb([red, green, blue]);
-      }
-
-      imgbuf.save(args.remove(0)).unwrap();
-    }
-    None => exit(1),
-  }
-}
-
-pub fn grayscale(args: &mut Vec<String>) {
-  match check_for_invalid_args(&args, "grayscale", 2) {
-    Some(()) => {
-      let img = open_image(args.remove(0));
-
-      // .grayscale() takes no arguments. It returns a new image.
-      let new_image = img.grayscale();
-      save_image(new_image, args.remove(0));
-    }
-    None => exit(1),
-  }
-}
-
-pub fn invert(args: &mut Vec<String>) {
-  match check_for_invalid_args(&args, "invert", 2) {
-    Some(()) => {
-      let mut img = open_image(args.remove(0));
-
-      // .invert() takes no arguments and converts the image in-place, so you
-      // will use the same image to save out to a different file.
-      img.invert();
-      save_image(img, args.remove(0));
-    }
-    None => exit(1),
-  }
-}
-
-// This code was adapted from https://github.com/PistonDevelopers/image
+/// Generates a fractal image.
+///
+/// Arguments:
+///
+/// * `output` - String
+///
+/// Usage: ```fractal output.png```
 pub fn fractal(args: &mut Vec<String>) {
   match check_for_invalid_args(&args, "fractal", 1) {
     Some(()) => {
@@ -213,6 +235,92 @@ pub fn fractal(args: &mut Vec<String>) {
   }
 }
 
+/// Generates an image by `width`, `height`, `red`, `green` and `blue`.
+///
+/// Arguments:
+///
+/// * `width` - u32
+/// * `height` - u32
+/// * `red` - u8
+/// * `green` - u8
+/// * `blue` - u8
+/// * `output` - String
+///
+/// Usage: ```generate 640 480 0 0 0 input.png output.png```
+pub fn generate(args: &mut Vec<String>) {
+  match check_for_invalid_args(&args, "rotate", 6) {
+    Some(()) => {
+      let [width, height] =
+        ["width", "height"].map(|d| parse_number::<u32>("generate", d, args.remove(0)));
+
+      let [red, green, blue]: [u8; 3] =
+        ["red", "green", "blue"].map(|c| parse_number::<u8>("generate", c, args.remove(0)));
+
+      let mut imgbuf = ImageBuffer::new(width, height);
+
+      for (_x, _y, pixel) in imgbuf.enumerate_pixels_mut() {
+        // Actually set the pixel. red, green, and blue are u8 values!
+        *pixel = image::Rgb([red, green, blue]);
+      }
+
+      imgbuf.save(args.remove(0)).unwrap();
+    }
+    None => exit(1),
+  }
+}
+
+/// Grayscales an image.
+///
+/// Arguments:
+///
+/// * `input` - String
+/// * `output` - String
+///
+/// Usage: ```grayscale input.png output.png```
+pub fn grayscale(args: &mut Vec<String>) {
+  match check_for_invalid_args(&args, "grayscale", 2) {
+    Some(()) => {
+      let img = open_image(args.remove(0));
+
+      // .grayscale() takes no arguments. It returns a new image.
+      let new_image = img.grayscale();
+      save_image(new_image, args.remove(0));
+    }
+    None => exit(1),
+  }
+}
+
+/// Invert an image.
+///
+/// Arguments:
+///
+/// * `input` - String
+/// * `output` - String
+///
+/// Usage: ```invert input.png output.png```
+pub fn invert(args: &mut Vec<String>) {
+  match check_for_invalid_args(&args, "invert", 2) {
+    Some(()) => {
+      let mut img = open_image(args.remove(0));
+
+      // .invert() takes no arguments and converts the image in-place, so you
+      // will use the same image to save out to a different file.
+      img.invert();
+      save_image(img, args.remove(0));
+    }
+    None => exit(1),
+  }
+}
+
+/// Rotates an image.
+///
+/// Arguments:
+///
+/// * `rotate` - u32 (90, 180, 270)
+/// * `input` - String
+/// * `output` - String
+///
+/// Usage: ```rotate input.png output.png```
 pub fn rotate(args: &mut Vec<String>) {
   match check_for_invalid_args(&args, "rotate", 3) {
     Some(()) => {
